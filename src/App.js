@@ -3,15 +3,20 @@ import { Switch, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+
 import AuthService from "./services/auth.service";
 
 import Login from "./components/login.component";
 // import Register from "./components/register.component";
-// import Home from "./components/home.component";
+import Home from "./components/home.component";
 import Profile from "./components/profile.component";
+import MapContainer from "./components/maps.component";
+import Bucket from "./components/bin.component";
+import Weather from "./components/weather.component";
 // import BoardUser from "./components/board-user.component";
 // import BoardModerator from "./components/board-moderator.component";
 // import BoardAdmin from "./components/board-admin.component";
+
 
 class App extends Component {
   constructor(props) {
@@ -25,8 +30,17 @@ class App extends Component {
     };
   }
 
+
+
   componentDidMount() {
-    const user = AuthService.getCurrentUser();
+    const user = AuthService.getCurrentUser().then(
+      response => {
+        if (response.status == 401) {
+          AuthService.refresh();
+          window.location.reload();
+        }
+      }
+    );
 
     if (user) {
       this.setState({
@@ -48,18 +62,31 @@ class App extends Component {
       <div>
         <nav className="navbar navbar-expand navbar-dark bg-dark">
           <Link to={"/"} className="navbar-brand">
-            Weather Forecast
+            QARAP QALMA
           </Link>
           <div className="navbar-nav mr-auto">
             <li className="nav-item">
+              <Link to={"/profile"} className="nav-link">
+                Профиль
+              </Link>
+            </li>
+            <li className="nav-item">
               <Link to={"/home"} className="nav-link">
-                Home
+                Мои города
+              </Link>
+            </li>
+
+
+
+            <li className="nav-item">
+              <Link to={"/map"} className="nav-link">
+                Добавить город
               </Link>
             </li>
 
             <li className="nav-item">
-              <Link to={"/profile"} className="nav-link">
-                Profile
+              <Link to={"/bin"} className="nav-link">
+                Корзина
               </Link>
             </li>
 
@@ -79,13 +106,6 @@ class App extends Component {
               </li>
             )}
 
-            {currentUser && (
-              <li className="nav-item">
-                <Link to={"/user"} className="nav-link">
-                  User
-                </Link>
-              </li>
-            )}
           </div>
 
           {currentUser ? (
@@ -97,7 +117,7 @@ class App extends Component {
               </li>
               <li className="nav-item">
                 <a href="/login" className="nav-link" onClick={this.logOut}>
-                  Log out
+                  Выйти
                 </a>
               </li>
             </div>
@@ -118,17 +138,19 @@ class App extends Component {
           )}
         </nav>
 
-        <div className="container mt-3">
-          <Switch>
-            {/* <Route exact path={["/", "/home"]} component={Home} /> */}
-            <Route exact path="/login" component={Login} />
-            {/* <Route exact path="/register" component={Register} /> */}
-            <Route exact path="/profile" component={Profile} />
-            {/* <Route path="/user" component={BoardUser} /> */}
-            {/* <Route path="/mod" component={BoardModerator} /> */}
-            {/* <Route path="/admin" component={BoardAdmin} /> */}
-          </Switch>
-        </div>
+        {/* <div className="container mt-0"> */}
+        <Switch>
+          <Route exact path={["/", "/home"]} component={Home} />
+          <Route exact path="/login" component={Login} />
+          {/* <Route exact path="/register" component={Register} /> */}
+          <Route exact path="/profile" component={Profile} />
+
+          <Route exact path="/map" component={MapContainer} />
+          <Route path="/bin" component={Bucket} />
+          <Route path="/home/:id" component={Weather} />
+          {/* <Route path="/admin" component={BoardAdmin} /> */}
+        </Switch>
+        {/* </div> */}
       </div>
     );
   }

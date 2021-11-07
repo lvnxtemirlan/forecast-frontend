@@ -1,18 +1,17 @@
 import React, { Component } from "react";
 
 import UserService from "../services/user.service";
-import MapService from '../services/maps.service';
-import ApiWeatherService from '../api/weather.service';
+import MapService from '../services/maps.service'
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 import authService from "../services/auth.service";
 import swal from 'sweetalert';
 
-class Home extends Component {
+class Bucket extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            is_deleted: false,
+            is_deleted: true,
             content: {}
         };
     }
@@ -40,23 +39,24 @@ class Home extends Component {
             });
     }
 
-    deleteData(pk) {
+    recoverData(pk) {
         swal({
-            title: "Вы хотите удалить?",
-            text: "Удаленная погода попадет в корзину",
-            icon: "warning",
+            title: "Вы хотите восстановить погоду?",
+            text: "Восстановленная погода вернется в актуальные данные",
+            icon: "info",
             buttons: true,
             dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                MapService.deleteWeather(pk).then(
+        }).then((willRecover) => {
+            if (willRecover) {
+                MapService.recoverWeather(pk).then(
                     response => {
+                        console.log(response.status);
                         if (response.status == 200) {
                             swal({
-                                title: "Успешно удален!",
+                                title: "Успешно восстановлен!",
                                 icon: "success",
                             }).then(() => {
-                                // window.location.reload();
+                                window.location.reload();
                             })
                         }
 
@@ -67,32 +67,6 @@ class Home extends Component {
 
     }
 
-
-    getApiWeather(content) {
-
-        ApiWeatherService.getWeather(content.coordinates.latitude, content.coordinates.longitude).then(
-            response => {
-                if (response.status == 200) {
-                    MapService.postWeather(content.id, JSON.stringify(response.data))
-                    swal({
-                        title: "Погода записана",
-                        // text: "Удаленная погода попадет в корзину",
-                        icon: "success",
-                    }).then((willDelete) => {
-                        this.props.history.push('home/' + content.id);
-                    })
-                }
-            }
-        )
-
-
-
-    }
-
-    retrieveWeather(pk) {
-        this.props.history.push("/home/" + pk);
-    }
-
     render() {
         var data = [];
         for (var i = 0; i < this.state.content.count; i++) {
@@ -101,9 +75,7 @@ class Home extends Component {
                 <td>{content[i].name.ru}</td>
                 <td>{content[i].coordinates.latitude.toFixed(3)}</td>
                 <td>{content[i].coordinates.longitude.toFixed(3)}</td>
-                <th scope="col"><button type="button" class="btn btn-success" onClick={this.getApiWeather.bind(this, content[i])}>Отправить запрос</button></th>
-                <th scope="col"><button type="button" class="btn btn-primary" onClick={this.retrieveWeather.bind(this, content[i].id)}>Посмотреть</button></th>
-                <th scope="col"><button type="button" class="btn btn-danger" onClick={this.deleteData.bind(this, content[i].id)}>Удалить</button></th>
+                <th scope="col"><button type="button" class="btn btn-secondary" onClick={this.recoverData.bind(this, content[i].id)}>Восстановить</button></th>
             </tr>)
         }
 
@@ -111,15 +83,13 @@ class Home extends Component {
         return (
             <div className="container">
                 <header className="jumbotron">
-                    <table class="table table-striped">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th scope="col">Город</th>
                                 <th scope="col">Широта</th>
                                 <th scope="col">Долгота</th>
-                                <th scope="col">Узнать погоду</th>
-                                <th scope="col">Обзор</th>
-                                <th scope="col">Удалить</th>
+                                <th scope="col"></th>
 
                             </tr>
                         </thead>
@@ -127,8 +97,6 @@ class Home extends Component {
                             {data}
                         </tbody>
                         <tfoot>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
                             <th scope="col"></th>
                             <th scope="col"></th>
                             <th scope="col"></th>
@@ -142,4 +110,4 @@ class Home extends Component {
     }
 }
 
-export default Home;
+export default Bucket;

@@ -15,7 +15,10 @@ export default class Profile extends Component {
     componentDidMount() {
         AuthService.getCurrentUser().then(
             response => {
-                console.log(response.data);
+                if (response.status.code == 401) {
+                    AuthService.refresh();
+                    window.location.reload();
+                }
                 this.setState({
                     content: response.data
                 });
