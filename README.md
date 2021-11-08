@@ -1,6 +1,8 @@
 # Getting Started with Create React App
 
 This project was bootstrapped with [Link to website](http://690395-ca28760.tmweb.ru/login).
+Login: test_user1
+Password: 123
 
 ## Available Scripts
 
